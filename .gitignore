@@ -1,0 +1,30 @@
+# Magento specific
+/generated/
+/var/
+pub/media/
+pub/static/
+
+# Composer
+/vendor/
+composer.lock
+
+# Node
+node_modules/
+yarn.lock
+
+# IDEs and editors
+/.idea/
+/.vscode/
+/nbproject/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Environment and configuration files
+.env
+auth.json
