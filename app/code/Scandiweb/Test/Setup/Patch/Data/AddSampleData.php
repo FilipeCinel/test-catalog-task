@@ -10,6 +10,10 @@ use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\StateException;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -17,52 +21,88 @@ use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
 use Magento\InventoryApi\Api\SourceItemsSaveInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
-
-//...
-
 class AddSampleData implements DataPatchInterface
 {
+    /**
+     *  SKU for the sample product.
+     */
     protected const PRODUCT_SKU = 't-shirt';
 
-    protected ModuleDataSetupInterface $setup;
-
+    /**
+     * @var ProductInterfaceFactory
+     */
     protected ProductInterfaceFactory $productInterfaceFactory;
 
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected ProductRepositoryInterface $productRepository;
 
+    /**
+     * @var State
+     */
     protected State $appState;
 
+    /**
+     * @var EavSetup
+     */
     protected EavSetup $eavSetup;
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected StoreManagerInterface $storeManager;
 
+    /**
+     * @var SourceItemInterfaceFactory
+     */
     protected SourceItemInterfaceFactory $sourceItemFactory;
 
+    /**
+     * @var SourceItemsSaveInterface
+     */
     protected SourceItemsSaveInterface $sourceItemsSaveInterface;
 
+    /**
+     * @var CategoryLinkManagementInterface
+     */
     protected CategoryLinkManagementInterface $categoryLink;
 
+    /**
+     * @var CategoryCollectionFactory
+     */
     protected CategoryCollectionFactory $categoryCollectionFactory;
 
+    /**
+     * @var array
+     */
     protected array $sourceItems = [];
 
+    /**
+     * @param ProductInterfaceFactory $productInterfaceFactory
+     * @param ProductRepositoryInterface $productRepository
+     * @param State $appState
+     * @param StoreManagerInterface $storeManager
+     * @param EavSetup $eavSetup
+     * @param SourceItemInterfaceFactory $sourceItemFactory
+     * @param SourceItemsSaveInterface $sourceItemsSaveInterface
+     * @param CategoryLinkManagementInterface $categoryLink
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     */
     public function __construct(
-        ModuleDataSetupInterface        $setup,
-        ProductInterfaceFactory         $productInterfaceFactory,
-        ProductRepositoryInterface      $productRepository,
-        State                           $appState,
-        StoreManagerInterface           $storeManager,
-        EavSetup                        $eavSetup,
-        SourceItemInterfaceFactory      $sourceItemFactory,
-        SourceItemsSaveInterface        $sourceItemsSaveInterface,
+        ProductInterfaceFactory $productInterfaceFactory,
+        ProductRepositoryInterface $productRepository,
+        State $appState,
+        StoreManagerInterface $storeManager,
+        EavSetup $eavSetup,
+        SourceItemInterfaceFactory $sourceItemFactory,
+        SourceItemsSaveInterface $sourceItemsSaveInterface,
         CategoryLinkManagementInterface $categoryLink,
-        CategoryCollectionFactory       $categoryCollectionFactory
-    )
-    {
+        CategoryCollectionFactory $categoryCollectionFactory
+    ) {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
-        $this->setup = $setup;
         $this->eavSetup = $eavSetup;
         $this->storeManager = $storeManager;
         $this->sourceItemFactory = $sourceItemFactory;
@@ -71,11 +111,22 @@ class AddSampleData implements DataPatchInterface
         $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
+    /**
+     * @return void
+     * @throws \Exception
+     */
     public function apply(): void
     {
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
     }
 
+    /**
+     * @return void
+     * @throws CouldNotSaveException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws StateException
+     */
     public function execute(): void
     {
         $product = $this->productInterfaceFactory->create();
@@ -108,7 +159,6 @@ class AddSampleData implements DataPatchInterface
         $this->categoryLink->assignProductToCategories($product->getSku(), $categoryIds);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -116,7 +166,6 @@ class AddSampleData implements DataPatchInterface
     {
         return [];
     }
-
 
     /**
      * {@inheritDoc}
